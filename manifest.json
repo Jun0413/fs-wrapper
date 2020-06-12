@@ -1,0 +1,37 @@
+{
+	"rpath": [
+		"/home/jhz/Desktop/CS/CSE227/vscode",
+		"/home/jhz/Desktop/CS/CSE227/dev_workspace",
+		"/home/jhz/.vscode-oss-dev",
+		"/home/jhz/.config/code-oss-dev",
+
+		"/lib/x86_64-linux-gnu",
+		"/usr/lib",
+		"/dev/null",
+		"/dev/urandom",
+		"/sys/devices/system/cpu",
+		"/proc/filesystems",
+		"/proc/cpuinfo",
+
+		".git",
+
+		"/home/jhz/.ssh/id_rsa"
+	],
+
+	"rname": [
+		".prettierrc",
+		".prettierrc.json",
+		".prettierrc.yaml",
+		".prettierrc.yml",
+		".prettierrc.js",
+		"prettier.config.js",
+		".prettierrc.toml",
+		"package.json"
+	],
+
+	"wpath": [
+		"/home/jhz/Desktop/CS/CSE227/dev_workspace"
+	],
+
+	"wname": []
+}

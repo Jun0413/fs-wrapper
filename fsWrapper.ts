@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 
 interface AccessPolicy {
-	r: [string];
-	w: [string];
+	rpath: string[];
+	rname: string[];
+	wpath: string[];
+	wname: string[];
 }
 
 /**
@@ -14,18 +16,48 @@ interface AccessPolicy {
  */
 // TODO: now path can only be string
 function checkAccessibility(policy: AccessPolicy, path: string, mode: string) {
-	const accessiblePaths: [string] = policy[mode];
-	// if (! accessiblePaths.some(parentPath => (fs.realpathSync(path).indexOf(fs.realpathSync(parentPath)) == 0))) {
-	//     throw new Error(`${fs.realpathSync(path)} is inaccessible!`);
-	// }
+	const startWith = (s: string, prefix: string): boolean => {
+		return (prefix.length <= s.length) && (s.substr(0, prefix.length) === prefix);
+	};
+	if (fs.existsSync(path)) {
+		const realPath = fs.realpathSync(path);
+		const arr = realPath.split('/');
+		const realFile = arr[arr.length - 1];
+		let allow = false;
+		if (mode === 'r') {
+			policy.rpath.forEach(s => {
+				if (startWith(realPath, s)) {
+					allow = true;
+				}
+			});
+			policy.rname.forEach(s => {
+				if (s === realFile) {
+					allow = true;
+				}
+			});
+		} else if (mode === 'w') {
+			policy.wpath.forEach(s => {
+				if (startWith(realPath, s)) {
+					allow = true;
+				}
+			});
+			policy.wname.forEach(s => {
+				if (s === realFile) {
+					allow = true;
+				}
+			});
+		}
+		if (!allow) {
+			throw new Error(`${fs.realpathSync(path)} is inaccessible!`);
+		}
+	}
 }
 
 
 // Read global and local manifest files
 // and return the access policy
-// TODO
 function resolveAccessPolicy(extensionName: string): AccessPolicy {
-	return { r: ['/'], w: ['/'] };
+	return JSON.parse(fs.readFileSync('manifest.json', { encoding: 'utf8', flag: 'r' }));
 }
 
 
@@ -41,7 +73,7 @@ const oneFileFuncWrapper = (func: any, policy: AccessPolicy, mode: string) => (f
 const twoPathsFuncWrapper = (func: any, policy: AccessPolicy, _: any) => (p1: string, p2: string, ...args: any) => {
 	checkAccessibility(policy, p1, 'r');
 	checkAccessibility(policy, p2, 'w');
-	func(p1, p2, ...args);
+	return func(p1, p2, ...args);
 };
 
 // TODO: now accepting string flags only
